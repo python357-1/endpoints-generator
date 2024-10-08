@@ -14,7 +14,9 @@ internal class Program {
 			var runtimeAssemblies = Directory.GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll");
 			var paths = new List<string>(runtimeAssemblies);
 			paths.Add(Path.Join(Directory.GetCurrentDirectory(), args[0]));
+			paths.Add("Microsoft.AspNetCore.Mvc.ViewFeatures");
 			paths.Add("Microsoft.AspNetCore");
+			paths.Add("Microsoft.AspNetCore.Mvc");
 			var resolver = new PathAssemblyResolver(paths);
 
 			var mlc = new MetadataLoadContext(resolver);
@@ -24,7 +26,10 @@ internal class Program {
 				var types = assm.GetTypes();
 				foreach (var controller in types.Where(x =>
 					         x.Name.Contains("controller", StringComparison.InvariantCultureIgnoreCase))) {
-					Console.WriteLine(controller.Name);
+					Console.WriteLine(controller.FullName);
+					foreach (var method in controller.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)) {
+						Console.WriteLine(method.Name);
+					}
 				}
 
 			}
