@@ -10,7 +10,8 @@ public class ControllerData {
 
 	private IEnumerable<MethodInfo> Methods =>
 		Controller.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-	public IEnumerable<string> MethodNames { get; set; }
+
+	public IEnumerable<string> MethodNames => Methods.Select(x => x.Name);
 
 	public ControllerData(Type controller) {
 		Controller = controller;
@@ -20,7 +21,12 @@ public class ControllerData {
 internal class Program {
 	static void Main(string[] args) {
 		if (args.Length == 0) {
-			Console.WriteLine("no");
+			Console.WriteLine("Usage: endpoints <DLL>");
+			return;
+		}
+
+		if (args.Length == 1 && Path.GetExtension(args[0]) == string.Empty) {
+			Console.WriteLine("Usage: endpoints <DLL>\nDLL must be a file with an extension, usually a dll.");
 			return;
 		}
 
