@@ -1,7 +1,21 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 
 namespace endpointgenerator;
+
+public class ControllerData {
+	private Type Controller { get; init; }
+	public string Name => Controller.FullName;
+
+	private IEnumerable<MethodInfo> Methods =>
+		Controller.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+	public IEnumerable<string> MethodNames { get; set; }
+
+	public ControllerData(Type controller) {
+		Controller = controller;
+	}
+}
 
 internal class Program {
 	static void Main(string[] args) {
@@ -24,14 +38,13 @@ internal class Program {
 			using (mlc) {
 				var assm = mlc.LoadFromAssemblyPath(Path.GetFileName(args[0]));
 				var types = assm.GetTypes();
+				var controllerDatas = Enumerable.Empty<ControllerData>();
 				foreach (var controller in types.Where(x =>
 					         x.Name.Contains("controller", StringComparison.InvariantCultureIgnoreCase))) {
-					Console.WriteLine(controller.FullName);
-					foreach (var method in controller.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)) {
-						Console.WriteLine(method.Name);
-					}
+					controllerDatas.Append(new ControllerData(controller));
 				}
 
+				Console.WriteLine(JsonSerializer.Serialize(controllerDatas));
 			}
 			
 		}
