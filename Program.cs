@@ -41,7 +41,7 @@ internal class Program {
 				var controllerDatas = Enumerable.Empty<ControllerData>();
 				foreach (var controller in types.Where(x =>
 					         x.Name.Contains("controller", StringComparison.InvariantCultureIgnoreCase))) {
-					controllerDatas.Append(new ControllerData(controller));
+					controllerDatas = controllerDatas.Append(new ControllerData(controller));
 				}
 
 				Console.WriteLine(JsonSerializer.Serialize(controllerDatas));
